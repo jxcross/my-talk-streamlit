@@ -964,57 +964,51 @@ def generate_multi_voice_audio(text, api_key, voice1, voice2, version_type):
 
 
 def display_audio_with_loop_option(audio_file, label, unique_key):
-    """반복재생 옵션이 있는 오디오 플레이어 (모바일 호환성 개선)"""
+    """반복재생 옵션이 있는 오디오 플레이어 (모바일 호환성 개선 + 컬럼 중첩 문제 해결)"""
     if os.path.exists(audio_file):
-        # 모바일 감지 (User Agent 기반)
-        # Streamlit에서는 직접 User Agent를 가져올 수 없으므로, 
-        # 화면 크기나 다른 방법으로 모바일을 감지하거나, 두 가지 옵션을 모두 제공
+        # 컬럼 중첩 문제를 피하기 위해 세로 배치로 변경
         
-        col1, col2 = st.columns([1, 4])
+        # 반복재생 체크박스
+        loop_enabled = st.checkbox(f"🔁 반복재생", key=f"loop_{unique_key}", 
+                                 value=False, 
+                                 help="반복재생 (모바일에서는 지원되지 않을 수 있습니다)")
         
-        with col1:
-            # 반복재생 체크박스
-            loop_enabled = st.checkbox(f"🔁", key=f"loop_{unique_key}", 
-                                     value=False, 
-                                     help="반복재생 (모바일에서는 지원되지 않을 수 있습니다)")
-        
-        with col2:
-            # 모바일 호환성을 위해 두 가지 방식 모두 제공
-            if loop_enabled:
-                # 먼저 HTML 방식 시도
-                try:
-                    with open(audio_file, 'rb') as f:
-                        audio_bytes = f.read()
+        # 오디오 플레이어
+        if loop_enabled:
+            # 먼저 HTML 방식 시도
+            try:
+                with open(audio_file, 'rb') as f:
+                    audio_bytes = f.read()
+                
+                # 파일 크기 제한 (모바일 고려)
+                if len(audio_bytes) < 5 * 1024 * 1024:  # 5MB 미만
+                    audio_base64 = base64.b64encode(audio_bytes).decode()
+                    audio_html = f'''
+                    <div style="margin: 10px 0;">
+                        <audio controls loop style="width: 100%; max-width: 400px;">
+                            <source src="data:audio/mp3;base64,{audio_base64}" type="audio/mp3">
+                            <p>브라우저에서 오디오를 지원하지 않습니다. 아래 기본 플레이어를 사용하세요.</p>
+                        </audio>
+                    </div>
+                    '''
+                    st.markdown(audio_html, unsafe_allow_html=True)
                     
-                    # 파일 크기 제한 (모바일 고려)
-                    if len(audio_bytes) < 5 * 1024 * 1024:  # 5MB 미만
-                        audio_base64 = base64.b64encode(audio_bytes).decode()
-                        audio_html = f'''
-                        <div style="margin: 10px 0;">
-                            <audio controls loop style="width: 100%; max-width: 400px;">
-                                <source src="data:audio/mp3;base64,{audio_base64}" type="audio/mp3">
-                                <p>브라우저에서 오디오를 지원하지 않습니다. 아래 기본 플레이어를 사용하세요.</p>
-                            </audio>
-                        </div>
-                        '''
-                        st.markdown(audio_html, unsafe_allow_html=True)
-                        
-                        # 모바일에서 작동하지 않을 경우를 대비한 대체 플레이어
-                        with st.expander("📱 모바일용 대체 플레이어", expanded=False):
-                            st.audio(audio_file, format='audio/mp3')
-                            st.caption("모바일에서 반복재생이 작동하지 않으면 이 플레이어를 사용하세요")
-                    else:
-                        # 파일이 너무 크면 기본 플레이어 사용
+                    # 모바일에서 작동하지 않을 경우를 대비한 대체 플레이어
+                    with st.expander("📱 모바일용 대체 플레이어", expanded=False):
                         st.audio(audio_file, format='audio/mp3')
-                        st.caption("⚠️ 파일이 커서 기본 플레이어를 사용합니다")
-                        
-                except Exception as e:
-                    # HTML 방식 실패 시 기본 플레이어 사용
+                        st.caption("모바일에서 반복재생이 작동하지 않으면 이 플레이어를 사용하세요")
+                else:
+                    # 파일이 너무 크면 기본 플레이어 사용
                     st.audio(audio_file, format='audio/mp3')
-                    st.caption("⚠️ 반복재생을 사용할 수 없어 기본 플레이어를 사용합니다")
-            else:
-                # 일반 재생 모드
+                    st.caption("⚠️ 파일이 커서 기본 플레이어를 사용합니다")
+                    
+            except Exception as e:
+                # HTML 방식 실패 시 기본 플레이어 사용
                 st.audio(audio_file, format='audio/mp3')
+                st.caption("⚠️ 반복재생을 사용할 수 없어 기본 플레이어를 사용합니다")
+        else:
+            # 일반 재생 모드
+            st.audio(audio_file, format='audio/mp3')
     else:
         st.warning("⚠️ 오디오 파일을 찾을 수 없습니다.")
 
@@ -2296,7 +2290,7 @@ def main():
     <div style='text-align: center; color: #666; font-size: 0.8rem; margin-top: 2rem;'>
         <p>MyTalk v3.1 - Tab-based Generation with Multi-Voice TTS (Streamlit Cloud)</p>
         <p>📱 Local Storage | {tts_status} | 🔧 {ffmpeg_status}</p>
-        <p>Copyright © 2025 Sunggeun Han (mysomang@gmail.com)</p>
+        <p>Made with ❤️ using Streamlit | 원스톱 영어 학습 솔루션</p>
     </div>
     """, unsafe_allow_html=True)
 
