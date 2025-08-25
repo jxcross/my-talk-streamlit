@@ -5,6 +5,7 @@ MyTalk - 탭별 개별 생성 버전
 2. 기초 말하기 추가 (영어 초보자용 5문장)
 3. 각 탭마다 개별 (스크립트 작성), (음성 작성) 버튼
 4. 자동 생성 대신 사용자 선택 기반 생성
+5. imageio_ffmpeg를 사용한 오디오 합치기 (Streamlit Cloud 호환)
 """
 
 import streamlit as st
@@ -18,6 +19,7 @@ import shutil
 from pathlib import Path
 from datetime import datetime
 import re
+import subprocess
 
 # OpenAI Library
 try:
@@ -26,6 +28,23 @@ try:
 except ImportError:
     OPENAI_AVAILABLE = False
     st.error("OpenAI 라이브러리가 필요합니다. pip install openai로 설치해주세요.")
+
+# imageio_ffmpeg for Streamlit Cloud compatibility
+try:
+    import imageio_ffmpeg as ffmpeg
+    FFMPEG_AVAILABLE = True
+    # ffmpeg 실행 파일 경로 가져오기
+    FFMPEG_PATH = ffmpeg.get_ffmpeg_exe()
+except ImportError:
+    FFMPEG_AVAILABLE = False
+    FFMPEG_PATH = None
+
+# pydub as fallback
+try:
+    from pydub import AudioSegment
+    PYDUB_AVAILABLE = True
+except ImportError:
+    PYDUB_AVAILABLE = False
 
 
 class SimpleStorage:
@@ -700,6 +719,107 @@ def extract_role_dialogues(text, version_type):
         return None
 
 
+def merge_audio_files_ffmpeg(audio_files, output_file):
+    """imageio_ffmpeg를 사용한 오디오 파일 합치기 (Streamlit Cloud 호환)"""
+    try:
+        if not FFMPEG_AVAILABLE:
+            st.warning("imageio_ffmpeg가 설치되지 않았습니다.")
+            return False
+        
+        if not audio_files:
+            st.warning("합칠 오디오 파일이 없습니다.")
+            return False
+        
+        # 임시 텍스트 파일 생성 (ffmpeg concat 용)
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False) as f:
+            concat_file = f.name
+            for audio_file in audio_files:
+                if os.path.exists(audio_file):
+                    # 경로에 특수문자가 있을 수 있으므로 따옴표로 감싸기
+                    f.write(f"file '{audio_file}'\n")
+        
+        try:
+            # ffmpeg concat 명령어 실행
+            cmd = [
+                FFMPEG_PATH,
+                "-f", "concat",
+                "-safe", "0",
+                "-i", concat_file,
+                "-c", "copy",
+                "-y",  # 덮어쓰기
+                output_file
+            ]
+            
+            result = subprocess.run(cmd, capture_output=True, text=True, timeout=60)
+            
+            if result.returncode == 0:
+                st.write(f"✅ ffmpeg로 {len(audio_files)}개 파일 합치기 성공")
+                return True
+            else:
+                st.error(f"ffmpeg 오류: {result.stderr}")
+                return False
+                
+        except subprocess.TimeoutExpired:
+            st.error("ffmpeg 실행 시간 초과")
+            return False
+        except Exception as e:
+            st.error(f"ffmpeg 실행 오류: {str(e)}")
+            return False
+        finally:
+            # 임시 concat 파일 정리
+            if os.path.exists(concat_file):
+                os.unlink(concat_file)
+        
+    except Exception as e:
+        st.error(f"오디오 합치기 중 오류: {str(e)}")
+        return False
+
+
+def merge_audio_files_pydub(audio_files, silence_duration=1000):
+    """pydub을 사용한 오디오 파일 합치기 (fallback)"""
+    try:
+        if not PYDUB_AVAILABLE:
+            st.warning("pydub이 설치되지 않았습니다.")
+            return None
+        
+        if not audio_files:
+            st.warning("합칠 오디오 파일이 없습니다.")
+            return None
+        
+        combined_audio = AudioSegment.empty()
+        silence = AudioSegment.silent(duration=silence_duration)  # 1초 무음
+        
+        for i, audio_file in enumerate(audio_files):
+            if os.path.exists(audio_file):
+                try:
+                    # 무음 추가 (첫 번째가 아닐 경우)
+                    if i > 0:
+                        combined_audio += silence
+                    
+                    # 오디오 세그먼트 로드 및 추가
+                    audio_segment = AudioSegment.from_mp3(audio_file)
+                    combined_audio += audio_segment
+                    
+                    st.write(f"🎶 {i+1}. {os.path.basename(audio_file)}: {len(audio_segment)}ms 추가")
+                    
+                except Exception as e:
+                    st.warning(f"⚠️ {i+1}번째 오디오 합치기 실패: {e}")
+                    continue
+        
+        if len(combined_audio) > 0:
+            # 임시 파일에 저장
+            temp_file = tempfile.NamedTemporaryFile(delete=False, suffix='.mp3')
+            combined_audio.export(temp_file.name, format="mp3")
+            return temp_file.name
+        else:
+            st.error("⏱ 합성된 오디오가 비어있습니다.")
+            return None
+            
+    except Exception as e:
+        st.error(f"pydub 오디오 합치기 중 오류: {str(e)}")
+        return None
+
+
 def generate_multi_voice_audio(text, api_key, voice1, voice2, version_type):
     """다중 음성 오디오 생성 및 대화 순서 교차 합치기 - 완전히 개선된 버전"""
     try:
@@ -772,78 +892,55 @@ def generate_multi_voice_audio(text, api_key, voice1, voice2, version_type):
             # 대화 순서대로 오디오 합치기
             st.write("📄 대화 순서에 따라 오디오 합치는 중...")
             
-            try:
-                from pydub import AudioSegment
+            # 순서대로 정렬 (이미 순서대로 생성되었지만 확실히 하기 위해)
+            sentence_audio_files.sort(key=lambda x: x['index'])
+            
+            # 오디오 파일 경로 리스트 생성
+            audio_file_paths = [info['audio_file'] for info in sentence_audio_files]
+            
+            merged_audio_path = None
+            
+            # imageio_ffmpeg 우선 시도
+            if FFMPEG_AVAILABLE:
+                st.write("🔧 imageio_ffmpeg로 오디오 합치기 시도...")
+                temp_merged = tempfile.NamedTemporaryFile(delete=False, suffix='.mp3')
+                temp_merged.close()
                 
-                combined_audio = AudioSegment.empty()
-                silence = AudioSegment.silent(duration=1000)  # 1초 무음
-                
-                # 순서대로 정렬 (이미 순서대로 생성되었지만 확실히 하기 위해)
-                sentence_audio_files.sort(key=lambda x: x['index'])
-                
-                for i, audio_info in enumerate(sentence_audio_files):
-                    try:
-                        # 무음 추가 (첫 번째가 아닐 경우)
-                        if i > 0:
-                            combined_audio += silence
-                        
-                        # 오디오 세그먼트 로드 및 추가
-                        audio_segment = AudioSegment.from_mp3(audio_info['audio_file'])
-                        combined_audio += audio_segment
-                        
-                        st.write(f"🎶 {i+1}. {audio_info['role'].upper()}: {len(audio_segment)}ms 추가")
-                        
-                    except Exception as e:
-                        st.warning(f"⚠️ {i+1}번째 오디오 합치기 실패: {e}")
-                        continue
-                
-                if len(combined_audio) > 0:
-                    # 통합 오디오 파일 저장
-                    import tempfile
-                    temp_file = tempfile.NamedTemporaryFile(delete=False, suffix='.mp3')
-                    combined_audio.export(temp_file.name, format="mp3")
-                    
-                    st.success(f"🎉 대화 순서 교차 오디오 합성 완료! 총 길이: {len(combined_audio)}ms")
-                    
-                    # 결과 구성
-                    result = {
-                        'merged': temp_file.name,  # 통합된 대화 오디오
-                        'sentences': sentence_audio_files  # 개별 문장 정보
-                    }
-                    
-                    # 기존 형식과의 호환성을 위해 역할별 대표 파일도 포함
-                    role1_key = 'host' if version_type == 'podcast' else 'a'
-                    role2_key = 'guest' if version_type == 'podcast' else 'b'
-                    
-                    # 각 역할의 첫 번째 파일을 대표로 설정
-                    for audio_info in sentence_audio_files:
-                        if audio_info['role'] == role1_key and role1_key not in result:
-                            result[role1_key] = audio_info['audio_file']
-                        elif audio_info['role'] == role2_key and role2_key not in result:
-                            result[role2_key] = audio_info['audio_file']
-                    
-                    return result
-                else:
-                    st.error("⌛ 합성된 오디오가 비어있습니다.")
-                    return None
-                    
-            except ImportError:
-                st.warning("📦 pydub 라이브러리가 없어 오디오 합치기를 건너뜁니다.")
-                
-                # pydub 없이는 개별 파일들만 반환
-                result = {'sentences': sentence_audio_files}
-                
-                role1_key = 'host' if version_type == 'podcast' else 'a'
-                role2_key = 'guest' if version_type == 'podcast' else 'b'
-                
-                # 각 역할의 첫 번째 파일을 대표로 설정
-                for audio_info in sentence_audio_files:
-                    if audio_info['role'] == role1_key and role1_key not in result:
-                        result[role1_key] = audio_info['audio_file']
-                    elif audio_info['role'] == role2_key and role2_key not in result:
-                        result[role2_key] = audio_info['audio_file']
-                
-                return result
+                if merge_audio_files_ffmpeg(audio_file_paths, temp_merged.name):
+                    if os.path.exists(temp_merged.name) and os.path.getsize(temp_merged.name) > 0:
+                        merged_audio_path = temp_merged.name
+                        st.success("🎉 imageio_ffmpeg로 대화 순서 교차 오디오 합성 완료!")
+                    else:
+                        st.warning("⚠️ imageio_ffmpeg 합성 파일이 비어있습니다.")
+            
+            # ffmpeg 실패시 pydub 시도
+            if not merged_audio_path and PYDUB_AVAILABLE:
+                st.write("🔧 pydub로 오디오 합치기 시도...")
+                merged_audio_path = merge_audio_files_pydub(audio_file_paths)
+                if merged_audio_path:
+                    st.success("🎉 pydub로 대화 순서 교차 오디오 합성 완료!")
+            
+            # 결과 구성
+            result = {
+                'sentences': sentence_audio_files  # 개별 문장 정보
+            }
+            
+            # 통합 파일이 성공적으로 생성된 경우 추가
+            if merged_audio_path:
+                result['merged'] = merged_audio_path
+            
+            # 기존 형식과의 호환성을 위해 역할별 대표 파일도 포함
+            role1_key = 'host' if version_type == 'podcast' else 'a'
+            role2_key = 'guest' if version_type == 'podcast' else 'b'
+            
+            # 각 역할의 첫 번째 파일을 대표로 설정
+            for audio_info in sentence_audio_files:
+                if audio_info['role'] == role1_key and role1_key not in result:
+                    result[role1_key] = audio_info['audio_file']
+                elif audio_info['role'] == role2_key and role2_key not in result:
+                    result[role2_key] = audio_info['audio_file']
+            
+            return result
         
         # 단일 음성 (원본, 기초, TED)
         st.write(f"🎯 {version_type.upper()} 단일 음성 생성 중...")
@@ -1053,7 +1150,7 @@ def script_creation_page():
     
     # 현재 프로젝트 상태 표시
     if 'current_project_id' in st.session_state:
-        st.info(f"📁 현재 프로젝트: {st.session_state.current_project_id} | 같은 폴더에 모든 버전이 저장됩니다")
+        st.info(f"📝 현재 프로젝트: {st.session_state.current_project_id} | 같은 폴더에 모든 버전이 저장됩니다")
     else:
         st.info("🆕 새 프로젝트 - 첫 번째 저장 시 새 폴더가 생성됩니다")
     
@@ -1235,7 +1332,7 @@ def generate_script(version, version_name, input_content):
             st.success(f"✅ {version_name} 스크립트 생성 완료!")
             st.rerun()
         else:
-            st.error(f"❌ {version_name} 스크립트 생성 실패")
+            st.error(f"⌚ {version_name} 스크립트 생성 실패")
 
 
 def generate_translation(version, script_content, llm_provider):
@@ -1278,7 +1375,7 @@ def generate_audio(version, version_name, script_content):
                 st.success(f"✅ {version_name} 음성 생성 완료!")
             st.rerun()
         else:
-            st.error(f"❌ {version_name} 음성 생성 실패")
+            st.error(f"⌚ {version_name} 음성 생성 실패")
 
 
 def save_individual_version(version, results):
@@ -1837,7 +1934,7 @@ def settings_page():
     # Multi-Voice TTS 설정
     with st.expander("🎤 Multi-Voice TTS 설정", expanded=True):
         st.markdown("### 🎵 OpenAI TTS 음성 설정")
-        st.info("**음성언어-1**: 원본/기초 스크립트, Host/A 역할\n**음성언어-2**: TED 말하기, Guest/B 역할")
+        st.info("**음성언어-1**: 원본/기초 스크립트, Host/A 역할 \n**음성언어-2**: TED 말하기, Guest/B 역할")
         
         voice_options = {
             'Alloy (중성, 균형잡힌)': 'alloy',
@@ -1863,7 +1960,7 @@ def settings_page():
             try:
                 current_index1 = list(voice_options.values()).index(current_voice1)
             except ValueError:
-                current_index1 = 0
+                current_index1 = 0 # alloy 첫 번째
                 st.session_state.voice1 = 'alloy'
             
             selected_voice1_name = st.selectbox(
@@ -1970,6 +2067,21 @@ def settings_page():
             st.info(f"**저장된 프로젝트**: {len(projects)}개")
             st.info(f"**저장 위치**: {storage.base_dir}")
         
+        # 오디오 처리 라이브러리 상태
+        st.markdown("**오디오 처리 라이브러리 상태**")
+        if FFMPEG_AVAILABLE:
+            st.success("✅ imageio_ffmpeg 사용 가능 (우선 사용)")
+        else:
+            st.warning("⚠️ imageio_ffmpeg 없음")
+        
+        if PYDUB_AVAILABLE:
+            st.success("✅ pydub 사용 가능 (fallback)")
+        else:
+            st.warning("⚠️ pydub 없음")
+        
+        if not FFMPEG_AVAILABLE and not PYDUB_AVAILABLE:
+            st.error("❌ 오디오 합치기 라이브러리가 없습니다. imageio_ffmpeg 또는 pydub를 설치하세요.")
+        
         # 시스템 테스트
         st.markdown("**시스템 테스트**")
         if st.button("🔧 전체 시스템 테스트"):
@@ -1999,9 +2111,9 @@ def settings_page():
 
 
 def main():
-    """메인 애플리케이션 (탭별 개별 생성 버전)"""
+    """메인 애플리케이션 (탭별 개별 생성 버전 + imageio_ffmpeg 지원)"""
     st.set_page_config(
-        page_title="MyTalk - Tab-based Generation",
+        page_title="MyTalk - Tab-based Generation with imageio_ffmpeg",
         page_icon="🎙️",
         layout="wide",
         initial_sidebar_state="collapsed"
@@ -2063,7 +2175,7 @@ def main():
     st.markdown("""
     <div style='text-align: center; padding: 1rem; background: linear-gradient(90deg, #4CAF50, #45a049); border-radius: 10px; margin-bottom: 2rem;'>
         <h1 style='color: white; margin: 0;'>🎙️ MyTalk</h1>
-        <p style='color: white; margin: 0; opacity: 0.9;'>Tab-based Script Generation with Multi-Voice TTS</p>
+        <p style='color: white; margin: 0; opacity: 0.9;'>Tab-based Script Generation with Multi-Voice TTS (Streamlit Cloud Compatible)</p>
     </div>
     """, unsafe_allow_html=True)
     
@@ -2101,12 +2213,13 @@ def main():
     # 푸터
     st.markdown("---")
     tts_status = f"🎵 Multi-Voice TTS ({st.session_state.voice1}/{st.session_state.voice2})"
+    ffmpeg_status = "imageio_ffmpeg" if FFMPEG_AVAILABLE else ("pydub" if PYDUB_AVAILABLE else "No Audio Merger")
     
     st.markdown(f"""
     <div style='text-align: center; color: #666; font-size: 0.8rem; margin-top: 2rem;'>
-        <p>MyTalk v3.0 - Tab-based Generation with Multi-Voice TTS</p>
-        <p>📱 Local Storage | {tts_status}</p>
-        <p>Made with ❤️ using Streamlit | 원스톱 영어 학습 솔루션</p>
+        <p>MyTalk v3.1 - Tab-based Generation with Multi-Voice TTS (Streamlit Cloud)</p>
+        <p>📱 Local Storage | {tts_status} | 🔧 {ffmpeg_status}</p>
+        <p>Copyright © 2025 Sunggeun Han (mysomang@gmail.com)</p>
     </div>
     """, unsafe_allow_html=True)
 
@@ -2117,8 +2230,9 @@ if __name__ == "__main__":
         st.code("pip install openai", language="bash")
         st.markdown("### 추가 의존성")
         st.markdown("음성 합치기 기능을 위해 다음 중 하나를 설치하세요:")
-        st.code("pip install pydub", language="bash")  
-        st.markdown("또는 시스템에 ffmpeg를 설치하세요")
+        st.code("pip install imageio_ffmpeg  # Streamlit Cloud 추천", language="bash")  
+        st.markdown("또는")
+        st.code("pip install pydub  # Fallback", language="bash")
         st.stop()
     
     main()
