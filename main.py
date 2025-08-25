@@ -2290,7 +2290,7 @@ def main():
     <div style='text-align: center; color: #666; font-size: 0.8rem; margin-top: 2rem;'>
         <p>MyTalk v3.1 - Tab-based Generation with Multi-Voice TTS (Streamlit Cloud)</p>
         <p>📱 Local Storage | {tts_status} | 🔧 {ffmpeg_status}</p>
-        <p>Made with ❤️ using Streamlit | 원스톱 영어 학습 솔루션</p>
+        <p>Copyright © 2025 Sunggeun Han (mysomang@gmail.com)</p>
     </div>
     """, unsafe_allow_html=True)
 
