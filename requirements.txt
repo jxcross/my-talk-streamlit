@@ -1,0 +1,83 @@
+# Core Framework
+streamlit==1.31.0
+streamlit-option-menu==0.3.6  # 향상된 네비게이션
+
+# LLM Providers
+openai==1.101.0 #0.28.1
+anthropic==0.18.1
+google-generativeai==0.3.2
+
+# TTS Options (여러 옵션 제공)
+gtts==2.5.0                    # Google TTS - 가장 안정적, 권장
+pyttsx3==2.90                  # 오프라인 TTS
+edge-tts==6.1.9                # Microsoft Edge TTS - 고품질 (선택사항)
+
+# Image & File Processing  
+Pillow==10.2.0                 # 이미지 처리
+pypdf2==3.0.1                  # PDF 처리 (선택사항)
+
+# Google Drive Integration (optional but recommended)
+google-auth==2.27.0
+google-auth-oauthlib==1.2.0
+google-auth-httplib2==0.2.0
+google-api-python-client==2.116.0
+
+# Data Export/Import
+openpyxl==3.1.2               # Excel 내보내기
+reportlab==4.0.7              # PDF 생성
+python-docx==0.8.11           # Word 문서 생성
+
+# Enhanced Audio Processing (선택사항)
+pydub==0.25.1                 # 오디오 변환
+librosa==0.10.1               # 고급 오디오 분석 (선택사항)
+
+# Performance & Caching
+cachetools==5.3.2             # 캐싱
+psutil==5.9.7                 # 시스템 리소스 모니터링
+
+# Async Support
+aiofiles==23.2.1              # 비동기 파일 처리
+asyncio-throttle==1.0.2       # 비동기 처리 제한
+
+# Development & Debugging
+loguru==0.7.2                 # 향상된 로깅
+python-dotenv==1.0.0          # 환경변수 관리
+
+# FFMPEG (오디오/비디오 처리)
+#conda install -c conda-forge ffmpeg
+#or
+#brew install ffmpeg
+
+
+
+# Optional: Advanced features
+# scikit-learn==1.3.2         # ML 기능 (향후 확장용)
+# matplotlib==3.8.2           # 차트 생성
+# plotly==5.17.0               # 인터랙티브 차트
+
+#---------------------------
+# 최소 설치 (기본 기능만)
+#---------------------------
+# streamlit==1.31.0
+# openai==0.28.1
+# anthropic==0.18.1
+# google-generativeai==0.3.2  
+# gtts==2.5.0
+# Pillow==10.2.0
+
+#---------------------------
+# 권장 설치 (전체 기능)
+#---------------------------
+# 위의 모든 패키지
+
+#---------------------------
+# 모바일 최적화 추가
+#---------------------------
+# streamlit-mobile-support>=0.1.0  # 모바일 지원 (가상 패키지)
+
+#---------------------------
+# 설치 명령어
+#---------------------------
+# 기본: pip install streamlit openai anthropic google-generativeai gtts Pillow
+# 전체: pip install -r requirements.txt
+# 개발: pip install -r requirements.txt && pip install pytest black flake8
