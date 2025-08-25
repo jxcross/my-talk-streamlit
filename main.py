@@ -20,6 +20,7 @@ from pathlib import Path
 from datetime import datetime
 import re
 import subprocess
+import base64
 
 # OpenAI Library
 try:
@@ -962,8 +963,34 @@ def generate_multi_voice_audio(text, api_key, voice1, voice2, version_type):
         return None
 
 
+def display_audio_with_loop_option(audio_file, label, unique_key):
+    """반복재생 옵션이 있는 오디오 플레이어"""
+    if os.path.exists(audio_file):
+        # 반복재생 체크박스
+        loop_enabled = st.checkbox(f"🔁 반복재생", key=f"loop_{unique_key}", value=False)
+        
+        # 오디오 플레이어 (loop 속성 추가)
+        if loop_enabled:
+            # HTML audio 태그로 loop 기능 구현
+            with open(audio_file, 'rb') as f:
+                audio_bytes = f.read()
+            
+            audio_base64 = base64.b64encode(audio_bytes).decode()
+            audio_html = f'''
+            <audio controls loop style="width: 100%; margin: 10px 0;">
+                <source src="data:audio/mp3;base64,{audio_base64}" type="audio/mp3">
+                Your browser does not support the audio element.
+            </audio>
+            '''
+            st.markdown(audio_html, unsafe_allow_html=True)
+        else:
+            st.audio(audio_file, format='audio/mp3')
+    else:
+        st.warning("⚠️ 오디오 파일을 찾을 수 없습니다.")
+
+
 def display_results(results, version):
-    """개별 결과 표시 함수 (개선된 Multi-Audio 지원)"""
+    """개별 결과 표시 함수 (개선된 Multi-Audio 지원 + 반복재생)"""
     if not results:
         return
         
@@ -1002,21 +1029,21 @@ def display_results(results, version):
         </div>
         ''', unsafe_allow_html=True)
         
-        # 개선된 오디오 재생
+        # 개선된 오디오 재생 (반복재생 옵션 포함)
         if audio_key in results and results[audio_key]:
             st.markdown("### 🎧 Audio")
             audio_data = results[audio_key]
             
             # 단일 오디오 파일인 경우
             if isinstance(audio_data, str) and os.path.exists(audio_data):
-                st.audio(audio_data, format='audio/mp3')
+                display_audio_with_loop_option(audio_data, f"{version_name} 메인 오디오", f"main_{version}")
             
             # 개선된 다중 오디오 파일인 경우
             elif isinstance(audio_data, dict):
                 # 통합된 대화 오디오 파일이 있으면 먼저 표시
                 if 'merged' in audio_data and os.path.exists(audio_data['merged']):
                     st.markdown("**🎵 완전한 대화 순서 음성 (A ↔ B 교차)**")
-                    st.audio(audio_data['merged'], format='audio/mp3')
+                    display_audio_with_loop_option(audio_data['merged'], "통합 대화", f"merged_{version}")
                     st.markdown("---")
                 
                 # 문장별 세부 정보가 있으면 표시
@@ -1034,7 +1061,11 @@ def display_results(results, version):
                             st.markdown(f"*{content_preview}*")
                             
                             if os.path.exists(sentence_info['audio_file']):
-                                st.audio(sentence_info['audio_file'], format='audio/mp3')
+                                display_audio_with_loop_option(
+                                    sentence_info['audio_file'], 
+                                    f"{role} 문장 {j+1}", 
+                                    f"sentence_{version}_{j}"
+                                )
                             st.markdown("---")
                 
                 # 기존 개별 음성들도 표시 (호환성)
@@ -1043,22 +1074,22 @@ def display_results(results, version):
                     with col1:
                         if 'host' in audio_data and os.path.exists(audio_data['host']):
                             st.markdown("**🎤 Host (음성언어-1) 대표**")
-                            st.audio(audio_data['host'], format='audio/mp3')
+                            display_audio_with_loop_option(audio_data['host'], "Host 대표", f"host_{version}")
                     with col2:
                         if 'guest' in audio_data and os.path.exists(audio_data['guest']):
                             st.markdown("**🎙️ Guest (음성언어-2) 대표**")
-                            st.audio(audio_data['guest'], format='audio/mp3')
+                            display_audio_with_loop_option(audio_data['guest'], "Guest 대표", f"guest_{version}")
                 
                 elif version == 'dialog':
                     col1, col2 = st.columns(2)
                     with col1:
                         if 'a' in audio_data and os.path.exists(audio_data['a']):
                             st.markdown("**👤 Person A (음성언어-1) 대표**")
-                            st.audio(audio_data['a'], format='audio/mp3')
+                            display_audio_with_loop_option(audio_data['a'], "Person A 대표", f"a_{version}")
                     with col2:
                         if 'b' in audio_data and os.path.exists(audio_data['b']):
                             st.markdown("**👥 Person B (음성언어-2) 대표**")
-                            st.audio(audio_data['b'], format='audio/mp3')
+                            display_audio_with_loop_option(audio_data['b'], "Person B 대표", f"b_{version}")
             else:
                 st.warning("⚠️ 오디오 파일을 찾을 수 없습니다.")
         
@@ -1960,7 +1991,7 @@ def settings_page():
             try:
                 current_index1 = list(voice_options.values()).index(current_voice1)
             except ValueError:
-                current_index1 = 0 # alloy 첫 번째
+                current_index1 = 0
                 st.session_state.voice1 = 'alloy'
             
             selected_voice1_name = st.selectbox(
@@ -2219,7 +2250,7 @@ def main():
     <div style='text-align: center; color: #666; font-size: 0.8rem; margin-top: 2rem;'>
         <p>MyTalk v3.1 - Tab-based Generation with Multi-Voice TTS (Streamlit Cloud)</p>
         <p>📱 Local Storage | {tts_status} | 🔧 {ffmpeg_status}</p>
-        <p>Copyright © 2025 Sunggeun Han (mysomang@gmail.com)</p>
+        <p>Made with ❤️ using Streamlit | 원스톱 영어 학습 솔루션</p>
     </div>
     """, unsafe_allow_html=True)
 
