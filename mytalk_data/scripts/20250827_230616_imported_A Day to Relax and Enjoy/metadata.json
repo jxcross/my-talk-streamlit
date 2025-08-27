@@ -1,0 +1,327 @@
+{
+  "project_id": "20250827_230616_imported",
+  "title": "A Day to Relax and Enjoy",
+  "category": "일반",
+  "input_method": "텍스트",
+  "input_content": "오늘은 회사에서 매달 마지막 수요일에 개인별로 오후 시간을 자유롭게 활용할 수 있는 날이다.\n영화 보기와 같은 문화 활동, 체육 활동, 봉사 활동을 할 수 있다.\n난 시원한 에어컨 밑에서 소파에 누워 netflix 를 시청했다. \n오랜만의 자유로운 시간이다.",
+  "created_at": "2025-08-27T22:48:29.345498",
+  "versions": [
+    "original",
+    "basic",
+    "ted",
+    "podcast",
+    "dialog"
+  ],
+  "saved_files": {
+    "original_script": "mytalk_data/scripts/20250827_230616_imported_A Day to Relax and Enjoy/original_script.txt",
+    "korean_translation": "mytalk_data/scripts/20250827_230616_imported_A Day to Relax and Enjoy/korean_translation.txt",
+    "original_audio": "mytalk_data/scripts/20250827_230616_imported_A Day to Relax and Enjoy/audio/original_audio.mp3",
+    "basic_script": "mytalk_data/scripts/20250827_230616_imported_A Day to Relax and Enjoy/basic_script.txt",
+    "basic_korean_translation": "mytalk_data/scripts/20250827_230616_imported_A Day to Relax and Enjoy/basic_korean_translation.txt",
+    "basic_audio": "mytalk_data/scripts/20250827_230616_imported_A Day to Relax and Enjoy/audio/basic_audio.mp3",
+    "ted_script": "mytalk_data/scripts/20250827_230616_imported_A Day to Relax and Enjoy/ted_script.txt",
+    "ted_korean_translation": "mytalk_data/scripts/20250827_230616_imported_A Day to Relax and Enjoy/ted_korean_translation.txt",
+    "ted_audio": "mytalk_data/scripts/20250827_230616_imported_A Day to Relax and Enjoy/audio/ted_audio.mp3",
+    "podcast_script": "mytalk_data/scripts/20250827_230616_imported_A Day to Relax and Enjoy/podcast_script.txt",
+    "podcast_korean_translation": "mytalk_data/scripts/20250827_230616_imported_A Day to Relax and Enjoy/podcast_korean_translation.txt",
+    "podcast_audio": {
+      "merged": "mytalk_data/scripts/20250827_230616_imported_A Day to Relax and Enjoy/audio/podcast_merged_dialogue.mp3",
+      "sentences": [
+        {
+          "role": "host",
+          "content": "Hey everyone, welcome back to another episode of “Chillin' on Company Time.” I’m your host, Jake!",
+          "order": 0,
+          "audio_file": "mytalk_data/scripts/20250827_230616_imported_A Day to Relax and Enjoy/audio/podcast_sentences/01_host_echo.mp3",
+          "voice": "echo",
+          "index": 0
+        },
+        {
+          "role": "guest",
+          "content": "And I’m your co-host, Sarah! How’s it going, Jake?",
+          "order": 1,
+          "audio_file": "mytalk_data/scripts/20250827_230616_imported_A Day to Relax and Enjoy/audio/podcast_sentences/02_guest_nova.mp3",
+          "voice": "nova",
+          "index": 1
+        },
+        {
+          "role": "host",
+          "content": "Pretty good! Just enjoying this lovely last Wednesday of the month. You know, the day we get to use our afternoon for whatever we want?",
+          "order": 2,
+          "audio_file": "mytalk_data/scripts/20250827_230616_imported_A Day to Relax and Enjoy/audio/podcast_sentences/03_host_echo.mp3",
+          "voice": "echo",
+          "index": 2
+        },
+        {
+          "role": "guest",
+          "content": "Oh, totally! It’s such a nice perk. I decided to take advantage of it and hit the gym for some exercise. What about you?",
+          "order": 3,
+          "audio_file": "mytalk_data/scripts/20250827_230616_imported_A Day to Relax and Enjoy/audio/podcast_sentences/04_guest_nova.mp3",
+          "voice": "nova",
+          "index": 3
+        },
+        {
+          "role": "host",
+          "content": "Nice! I went for the ultimate relaxation mode. I just lounged on my couch under the air conditioning and binged some Netflix. It was glorious!",
+          "order": 4,
+          "audio_file": "mytalk_data/scripts/20250827_230616_imported_A Day to Relax and Enjoy/audio/podcast_sentences/05_host_echo.mp3",
+          "voice": "echo",
+          "index": 4
+        },
+        {
+          "role": "guest",
+          "content": "Oh man, that sounds like a dream. What did you watch?",
+          "order": 5,
+          "audio_file": "mytalk_data/scripts/20250827_230616_imported_A Day to Relax and Enjoy/audio/podcast_sentences/06_guest_nova.mp3",
+          "voice": "nova",
+          "index": 5
+        },
+        {
+          "role": "host",
+          "content": "I finally caught up on that new series everyone’s been talking about, “The Last Resort.” It’s a mix of drama and a little mystery. Have you seen it?",
+          "order": 6,
+          "audio_file": "mytalk_data/scripts/20250827_230616_imported_A Day to Relax and Enjoy/audio/podcast_sentences/07_host_echo.mp3",
+          "voice": "echo",
+          "index": 6
+        },
+        {
+          "role": "guest",
+          "content": "Not yet, but I’ve heard good things! Is it worth the hype?",
+          "order": 7,
+          "audio_file": "mytalk_data/scripts/20250827_230616_imported_A Day to Relax and Enjoy/audio/podcast_sentences/08_guest_nova.mp3",
+          "voice": "nova",
+          "index": 7
+        },
+        {
+          "role": "host",
+          "content": "Definitely! The characters are super relatable, and the plot twists keep you on your toes. I was glued to the screen! What do you usually look for in a show?",
+          "order": 8,
+          "audio_file": "mytalk_data/scripts/20250827_230616_imported_A Day to Relax and Enjoy/audio/podcast_sentences/09_host_echo.mp3",
+          "voice": "echo",
+          "index": 8
+        },
+        {
+          "role": "guest",
+          "content": "I’m all about character development. If I can connect with the characters, I’m in. But, I also love a good plot twist. They keep things interesting, right?",
+          "order": 9,
+          "audio_file": "mytalk_data/scripts/20250827_230616_imported_A Day to Relax and Enjoy/audio/podcast_sentences/10_guest_nova.mp3",
+          "voice": "nova",
+          "index": 9
+        },
+        {
+          "role": "host",
+          "content": "For sure! Speaking of interesting, did you hear about some of our coworkers who went volunteering today instead? They were helping out at the local food bank.",
+          "order": 10,
+          "audio_file": "mytalk_data/scripts/20250827_230616_imported_A Day to Relax and Enjoy/audio/podcast_sentences/11_host_echo.mp3",
+          "voice": "echo",
+          "index": 10
+        },
+        {
+          "role": "guest",
+          "content": "Yeah, I did! I think it’s awesome that we get these options. It’s great to mix it up and give back to the community.",
+          "order": 11,
+          "audio_file": "mytalk_data/scripts/20250827_230616_imported_A Day to Relax and Enjoy/audio/podcast_sentences/12_guest_nova.mp3",
+          "voice": "nova",
+          "index": 11
+        },
+        {
+          "role": "host",
+          "content": "Absolutely. I feel like it really enhances our work-life balance. Plus, it’s nice to know we can use our time for something meaningful.",
+          "order": 12,
+          "audio_file": "mytalk_data/scripts/20250827_230616_imported_A Day to Relax and Enjoy/audio/podcast_sentences/13_host_echo.mp3",
+          "voice": "echo",
+          "index": 12
+        },
+        {
+          "role": "guest",
+          "content": "Right! And it’s a good way to bond with coworkers outside of the usual office setting. Did you ever think about doing something like that?",
+          "order": 13,
+          "audio_file": "mytalk_data/scripts/20250827_230616_imported_A Day to Relax and Enjoy/audio/podcast_sentences/14_guest_nova.mp3",
+          "voice": "nova",
+          "index": 13
+        },
+        {
+          "role": "host",
+          "content": "I did! I might try it next time. It’s just hard to pull myself away from the couch sometimes, you know?",
+          "order": 14,
+          "audio_file": "mytalk_data/scripts/20250827_230616_imported_A Day to Relax and Enjoy/audio/podcast_sentences/15_host_echo.mp3",
+          "voice": "echo",
+          "index": 14
+        },
+        {
+          "role": "guest",
+          "content": "Haha, I totally get that! But hey, there’s always next month. What’s on your radar for then?",
+          "order": 15,
+          "audio_file": "mytalk_data/scripts/20250827_230616_imported_A Day to Relax and Enjoy/audio/podcast_sentences/16_guest_nova.mp3",
+          "voice": "nova",
+          "index": 15
+        },
+        {
+          "role": "host",
+          "content": "Maybe a movie marathon with friends! Or I might just embrace my inner couch potato again.",
+          "order": 16,
+          "audio_file": "mytalk_data/scripts/20250827_230616_imported_A Day to Relax and Enjoy/audio/podcast_sentences/17_host_echo.mp3",
+          "voice": "echo",
+          "index": 16
+        },
+        {
+          "role": "guest",
+          "content": "Sounds like a plan! Well, that’s all for today, folks. Remember to make the most of your free time!",
+          "order": 17,
+          "audio_file": "mytalk_data/scripts/20250827_230616_imported_A Day to Relax and Enjoy/audio/podcast_sentences/18_guest_nova.mp3",
+          "voice": "nova",
+          "index": 17
+        },
+        {
+          "role": "host",
+          "content": "Thanks for tuning in! Catch you next time!",
+          "order": 18,
+          "audio_file": "mytalk_data/scripts/20250827_230616_imported_A Day to Relax and Enjoy/audio/podcast_sentences/19_host_echo.mp3",
+          "voice": "echo",
+          "index": 18
+        }
+      ],
+      "host": "mytalk_data/scripts/20250827_230616_imported_A Day to Relax and Enjoy/audio/podcast_audio_host.mp3",
+      "guest": "mytalk_data/scripts/20250827_230616_imported_A Day to Relax and Enjoy/audio/podcast_audio_guest.mp3"
+    },
+    "dialog_script": "mytalk_data/scripts/20250827_230616_imported_A Day to Relax and Enjoy/dialog_script.txt",
+    "dialog_korean_translation": "mytalk_data/scripts/20250827_230616_imported_A Day to Relax and Enjoy/dialog_korean_translation.txt",
+    "dialog_audio": {
+      "merged": "mytalk_data/scripts/20250827_230616_imported_A Day to Relax and Enjoy/audio/dialog_merged_dialogue.mp3",
+      "sentences": [
+        {
+          "role": "a",
+          "content": "Hey, Sarah! What are you planning to do with your free afternoon today?",
+          "order": 0,
+          "audio_file": "mytalk_data/scripts/20250827_230616_imported_A Day to Relax and Enjoy/audio/dialog_sentences/01_a_echo.mp3",
+          "voice": "echo",
+          "index": 0
+        },
+        {
+          "role": "b",
+          "content": "Hi, Mike! I’m thinking about catching a movie. It’s been ages since I had time to relax. How about you?",
+          "order": 1,
+          "audio_file": "mytalk_data/scripts/20250827_230616_imported_A Day to Relax and Enjoy/audio/dialog_sentences/02_b_nova.mp3",
+          "voice": "nova",
+          "index": 1
+        },
+        {
+          "role": "a",
+          "content": "That sounds great! I just finished binge-watching a series on Netflix. But today, I’m going to take a stroll at the park. I need some fresh air!",
+          "order": 2,
+          "audio_file": "mytalk_data/scripts/20250827_230616_imported_A Day to Relax and Enjoy/audio/dialog_sentences/03_a_echo.mp3",
+          "voice": "echo",
+          "index": 2
+        },
+        {
+          "role": "b",
+          "content": "Nice choice! Which series were you watching?",
+          "order": 3,
+          "audio_file": "mytalk_data/scripts/20250827_230616_imported_A Day to Relax and Enjoy/audio/dialog_sentences/04_b_nova.mp3",
+          "voice": "nova",
+          "index": 3
+        },
+        {
+          "role": "a",
+          "content": "I was watching that new crime drama, \"The Silent Witness.\" It’s really intense! You should check it out if you like thrillers.",
+          "order": 4,
+          "audio_file": "mytalk_data/scripts/20250827_230616_imported_A Day to Relax and Enjoy/audio/dialog_sentences/05_a_echo.mp3",
+          "voice": "echo",
+          "index": 4
+        },
+        {
+          "role": "b",
+          "content": "I love thrillers! I’ll add it to my watchlist. What’s your plan for the park?",
+          "order": 5,
+          "audio_file": "mytalk_data/scripts/20250827_230616_imported_A Day to Relax and Enjoy/audio/dialog_sentences/06_b_nova.mp3",
+          "voice": "nova",
+          "index": 5
+        },
+        {
+          "role": "a",
+          "content": "Just walking around, maybe grabbing a coffee. I’ll probably bring my headphones and listen to some music.",
+          "order": 6,
+          "audio_file": "mytalk_data/scripts/20250827_230616_imported_A Day to Relax and Enjoy/audio/dialog_sentences/07_a_echo.mp3",
+          "voice": "echo",
+          "index": 6
+        },
+        {
+          "role": "b",
+          "content": "Sounds relaxing! I might do that next time. I really just want to chill on my couch today.",
+          "order": 7,
+          "audio_file": "mytalk_data/scripts/20250827_230616_imported_A Day to Relax and Enjoy/audio/dialog_sentences/08_b_nova.mp3",
+          "voice": "nova",
+          "index": 7
+        },
+        {
+          "role": "a",
+          "content": "Totally understand! Sometimes you just need a day to do nothing.",
+          "order": 8,
+          "audio_file": "mytalk_data/scripts/20250827_230616_imported_A Day to Relax and Enjoy/audio/dialog_sentences/09_a_echo.mp3",
+          "voice": "echo",
+          "index": 8
+        },
+        {
+          "role": "b",
+          "content": "Exactly! Plus, it’s nice to have some time for ourselves, you know?",
+          "order": 9,
+          "audio_file": "mytalk_data/scripts/20250827_230616_imported_A Day to Relax and Enjoy/audio/dialog_sentences/10_b_nova.mp3",
+          "voice": "nova",
+          "index": 9
+        },
+        {
+          "role": "a",
+          "content": "For sure! So, are you going to the movies alone or inviting anyone?",
+          "order": 10,
+          "audio_file": "mytalk_data/scripts/20250827_230616_imported_A Day to Relax and Enjoy/audio/dialog_sentences/11_a_echo.mp3",
+          "voice": "echo",
+          "index": 10
+        },
+        {
+          "role": "b",
+          "content": "I’m thinking of going solo. It’s kind of nice to enjoy a movie by yourself sometimes.",
+          "order": 11,
+          "audio_file": "mytalk_data/scripts/20250827_230616_imported_A Day to Relax and Enjoy/audio/dialog_sentences/12_b_nova.mp3",
+          "voice": "nova",
+          "index": 11
+        },
+        {
+          "role": "a",
+          "content": "That’s true! A little “me time” is important. Well, enjoy the movie! Let me know how it is!",
+          "order": 12,
+          "audio_file": "mytalk_data/scripts/20250827_230616_imported_A Day to Relax and Enjoy/audio/dialog_sentences/13_a_echo.mp3",
+          "voice": "echo",
+          "index": 12
+        },
+        {
+          "role": "b",
+          "content": "Thanks, Mike! Have a great time at the park!",
+          "order": 13,
+          "audio_file": "mytalk_data/scripts/20250827_230616_imported_A Day to Relax and Enjoy/audio/dialog_sentences/14_b_nova.mp3",
+          "voice": "nova",
+          "index": 13
+        },
+        {
+          "role": "a",
+          "content": "You too! Catch you later!",
+          "order": 14,
+          "audio_file": "mytalk_data/scripts/20250827_230616_imported_A Day to Relax and Enjoy/audio/dialog_sentences/15_a_echo.mp3",
+          "voice": "echo",
+          "index": 14
+        },
+        {
+          "role": "b",
+          "content": "Bye!",
+          "order": 15,
+          "audio_file": "mytalk_data/scripts/20250827_230616_imported_A Day to Relax and Enjoy/audio/dialog_sentences/16_b_nova.mp3",
+          "voice": "nova",
+          "index": 15
+        }
+      ],
+      "a": "mytalk_data/scripts/20250827_230616_imported_A Day to Relax and Enjoy/audio/dialog_audio_a.mp3",
+      "b": "mytalk_data/scripts/20250827_230616_imported_A Day to Relax and Enjoy/audio/dialog_audio_b.mp3"
+    }
+  },
+  "updated_at": "2025-08-27T22:55:27.727453",
+  "imported_at": "2025-08-27T23:06:16.735402",
+  "original_project_id": "20250827_224829"
+}
